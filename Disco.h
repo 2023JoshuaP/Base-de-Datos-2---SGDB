@@ -7,6 +7,8 @@
 #include <string>
 using namespace std;
 
+int calcularTamRegistro(const string& linea);
+
 class Disco {
     public:
         int numPlatos;
@@ -27,7 +29,7 @@ class Disco {
         void crearCarpeta(const string& rutaCarpeta);
         void crearArchivo(const string& rutaArchivo);
 
-        /* Funcio para crear el Disco */
+        /* Funcion para crear el Disco */
         void crear();
         
         /* Funcion para calcular la capacidad del disco en su totalidad */
