@@ -3,10 +3,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <filesystem>
 #include <sstream>
 #include <string>
-namespace fs = std::filesystem;
 using namespace std;
 
 class Disco {
