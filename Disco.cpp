@@ -1,4 +1,4 @@
-#include "Disco.h"
+#include "./Disco.h"
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -51,6 +51,7 @@ void Disco::crearCarpeta(const string& rutaCarpeta) {
 
 void Disco::crearArchivo(const string& rutaArchivo) {
     ofstream file(rutaArchivo);
+    file.close();
 }
 
 void Disco::crear() {
@@ -58,7 +59,7 @@ void Disco::crear() {
     string carpeta = "Disco";
     crearCarpeta(carpeta);
 
-    for (int platos = 1; platos <= numPlatos; numPlatos++) {
+    for (int platos = 1; platos <= numPlatos; platos++) {
         string carpetaPlato = carpeta + "/Plato " + to_string(platos);
         crearCarpeta(carpetaPlato);
         for (int superficies = 1; superficies <= 2; superficies++) {
@@ -132,7 +133,7 @@ void Disco::llenarRegistrosEnSector(const string& archivo) {
 }
 
 void Disco::crearBloques(int tamanoBloque, int tamanoSector, int cantidadDeSectores) {
-    if (tamanoSector <= tamanoBloque) {
+    if (tamanoSector > tamanoBloque) {
         cout << "El tamanio del sector no debe ser mayor al del bloque" << endl;
         return;
     }
