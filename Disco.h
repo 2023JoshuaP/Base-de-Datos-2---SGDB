@@ -10,12 +10,13 @@ using namespace std;
 int calcularTamRegistro(const string& linea);
 
 class Disco {
-    public:
+    private:
         int numPlatos;
         int pistasPorSuperficie;
         int sectorPorPista;
         int bytesPorSector;
-    private:
+    public:
+        Disco() {}
         Disco(int platos, int pistas, int sectores, int bytes) : 
             numPlatos(platos), pistasPorSuperficie(pistas), sectorPorPista(sectores), bytesPorSector(bytes) {}
 
