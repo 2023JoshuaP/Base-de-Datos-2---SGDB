@@ -140,7 +140,7 @@ void Disco::crearBloques(int tamanoBloque, int tamanoSector, int cantidadDeSecto
     int sectoresPorBloque = tamanoBloque / tamanoSector;
     cout << "Cantidad de Sectores por Bloque: " << sectoresPorBloque << endl;
     int cantidadBloques = (cantidadDeSectores + sectoresPorBloque - 1) / sectoresPorBloque;
-    cout << "Cantidad de Bloques a crear: " << cantidadBloques;
+    cout << "Cantidad de Bloques a crear: " << endl;
     for (int platos = 1; platos <= numPlatos; platos++) {
         for (int superficies = 1; superficies <= 2; superficies++) {
             for (int pistas = 1; pistas <= pistasPorSuperficie; pistas++) {
