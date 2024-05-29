@@ -2,6 +2,71 @@
 #include "./Disco.cpp"
 using namespace std;
 
+const int MAX_CABECERAS = 12;
+
+bool convertirCSV(const string& archivoCSV, const string& archivoTXT) {
+    ifstream archivoEntrada(archivoCSV);
+    ofstream archivoSalida(archivoTXT);
+    ofstream archivoEsquema("esquema.txt", ios::app);
+
+    if (archivoEntrada && archivoSalida && archivoEsquema) {
+        string linea;
+        getline(archivoEntrada, linea);
+        stringstream cabeceras_ss(linea);
+        string cabecera;
+        string tipoDato;
+        int tamanios[MAX_CABECERAS] = {0};
+        int cantidadCabeceras = 0;
+        char respuesta;
+        cout << "¿Usar esquema existente? (S o s/N o n): ";
+        cin >> respuesta;
+
+        if (respuesta == 'S' || respuesta == 's') {
+            ifstream esquemaEntrada("esquema.txt");
+            if (!esquemaEntrada) {
+                cout << "No se pudo abrir el archivo esperado." << endl;
+                return false;
+            }
+            string lineaEsquema;
+            while (getline(esquemaEntrada, lineaEsquema)) {
+                istringstream esquema_ss(lineaEsquema);
+                getline(esquema_ss, cabecera, '#');
+                getline(esquema_ss, tipoDato, '#');
+                esquema_ss >> tamanios[cantidadCabeceras];
+                cantidadCabeceras++;
+            }
+            esquemaEntrada.close();
+        }
+        else {
+            while (getline(cabeceras_ss, cabecera, ';')) {
+                if (cantidadCabeceras >= MAX_CABECERAS) {
+                    cout << "Se excede el limite de cabeceras permitidas." << endl;
+                    return false;
+                }
+
+                cout << "Tipo de Dato (int, float, str) para las cabecera '" << cabecera << "': ";
+                cin >> tipoDato;
+
+                if (tipoDato == "str") {
+                    cout << "Dimension en bytes para la cabecera '" << cabecera << "': ";
+                    cin >> tamanios[cantidadCabeceras];
+                }
+                else {
+                    tamanios[cantidadCabeceras] = (tipoDato == "int" || tipoDato == "float") ? sizeof(float) : 0;
+                }
+
+                archivoEsquema << cabecera << "#" << tipoDato << "#" << tamanios[cantidadCabeceras] << endl;
+                cantidadCabeceras++;
+            }
+        }
+        while (getline(archivoEntrada, linea)) {
+            stringstream ss(linea);
+            string campo;
+            bool primerCampo = true;
+        }
+    }
+}
+
 int main() {
     bool discoCreado = false;
     Disco discoSimulado;
