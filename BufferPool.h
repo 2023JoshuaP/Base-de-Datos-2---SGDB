@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "./Frame.cpp"
+using namespace std;
 
 class BufferPool {
     public:
