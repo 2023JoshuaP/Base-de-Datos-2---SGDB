@@ -2,68 +2,58 @@
 #include "./Disco.cpp"
 using namespace std;
 
-const int MAX_CABECERAS = 12;
+void convertirCSVaTxt() {
+    string fileCSV;
+    string ruta = "/home/josue/Base de Datos II - SGBD/Base-de-Datos-2---SGDB/";
+    cout << "Debe tener el archivo que desea leer, denos el nombre ('0' para no leer CSV): " << endl;
+    cin >> fileCSV;
+    string rutaCSV = ruta + fileCSV;
 
-bool convertirCSV(const string& archivoCSV, const string& archivoTXT) {
-    ifstream archivoEntrada(archivoCSV);
-    ofstream archivoSalida(archivoTXT);
-    ofstream archivoEsquema("esquema.txt", ios::app);
+    if (fileCSV != "0"){
+        ifstream csv(rutaCSV);
+        if (csv.is_open()) {
+            string fileTxt;
+            cout << "Nombre del archivo txt: " << endl;
+            cin >> fileTxt;
 
-    if (archivoEntrada && archivoSalida && archivoEsquema) {
-        string linea;
-        getline(archivoEntrada, linea);
-        stringstream cabeceras_ss(linea);
-        string cabecera;
-        string tipoDato;
-        int tamanios[MAX_CABECERAS] = {0};
-        int cantidadCabeceras = 0;
-        char respuesta;
-        cout << "¿Usar esquema existente? (S o s/N o n): ";
-        cin >> respuesta;
-
-        if (respuesta == 'S' || respuesta == 's') {
-            ifstream esquemaEntrada("esquema.txt");
-            if (!esquemaEntrada) {
-                cout << "No se pudo abrir el archivo esperado." << endl;
-                return false;
+            ofstream fileSalida(fileTxt, ios::app);
+            string linea;
+            //bool primerCampo = true;
+            
+            while (getline(csv, linea)) {
+                istringstream ss(linea);
+                string campo;
+                bool primerElemento = true;
+                
+                while (getline(ss, campo, ',')) {
+                    if (campo.empty()) {
+                        campo = "NULL";
+                    }
+                    if (campo.front() == '"' && campo.back() != '"') {
+                        string campoCompleto = campo;
+                        while (getline(ss, campo, ',') && campo.back() != '"') {
+                            campoCompleto += "," + campo;
+                        }
+                        campoCompleto += "," + campo;
+                        campo = campoCompleto;
+                    }
+                    if (!primerElemento) {
+                        fileSalida << "#";
+                    }
+                    fileSalida << campo;
+                    primerElemento = false;
+                }
+                fileSalida << endl;
             }
-            string lineaEsquema;
-            while (getline(esquemaEntrada, lineaEsquema)) {
-                istringstream esquema_ss(lineaEsquema);
-                getline(esquema_ss, cabecera, '#');
-                getline(esquema_ss, tipoDato, '#');
-                esquema_ss >> tamanios[cantidadCabeceras];
-                cantidadCabeceras++;
-            }
-            esquemaEntrada.close();
+            fileSalida.close();
+            cout << "Archivo creado." << endl;
         }
         else {
-            while (getline(cabeceras_ss, cabecera, ';')) {
-                if (cantidadCabeceras >= MAX_CABECERAS) {
-                    cout << "Se excede el limite de cabeceras permitidas." << endl;
-                    return false;
-                }
-
-                cout << "Tipo de Dato (int, float, str) para las cabecera '" << cabecera << "': ";
-                cin >> tipoDato;
-
-                if (tipoDato == "str") {
-                    cout << "Dimension en bytes para la cabecera '" << cabecera << "': ";
-                    cin >> tamanios[cantidadCabeceras];
-                }
-                else {
-                    tamanios[cantidadCabeceras] = (tipoDato == "int" || tipoDato == "float") ? sizeof(float) : 0;
-                }
-
-                archivoEsquema << cabecera << "#" << tipoDato << "#" << tamanios[cantidadCabeceras] << endl;
-                cantidadCabeceras++;
-            }
+            cout << "Error al abrir el archivo CSV." << endl;
         }
-        while (getline(archivoEntrada, linea)) {
-            stringstream ss(linea);
-            string campo;
-            bool primerCampo = true;
-        }
+    }
+    else {
+        cout << "No se seleccionó un archivo CSV." << endl;
     }
 }
 
@@ -73,14 +63,22 @@ int main() {
     int opcion;
     while (true) {
         cout << "---------- MENU DE DISCO ----------" << endl;
-        cout << "1. Crear Disco por defecto - (2 platos, 2 superficies, 2 pistas, 4 sectores, 512 bytes por Sector, 1024 bytes por Bloque)" << endl;
-        cout << "2. Crear Disco manualmente." << endl;
-        cout << "3. Ver capacidad del Disco." << endl;
-        cout << "4. Eliminar Disco." << endl;
-        cout << "5. Terminar Simulacion del disco" << endl;
+        cout << "1. Convertir un CSV a archivo TXT." << endl;
+        cout << "2. Crear Disco por defecto - (2 platos, 2 superficies, 2 pistas, 4 sectores, 512 bytes por Sector, 1024 bytes por Bloque)" << endl;
+        cout << "3. Crear Disco manualmente." << endl;
+        cout << "4. Ver capacidad del Disco." << endl;
+        cout << "5. Eliminar Disco." << endl;
+        cout << "6. Terminar Simulacion del disco" << endl;
         cin >> opcion;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
+
         switch (opcion) {
             case 1: {
+                convertirCSVaTxt();
+                break;
+            }
+
+            case 2: {
                 if (!discoCreado) {
                     int platos = 2;
                     int pistas = 2;
@@ -99,14 +97,13 @@ int main() {
                     
                     cout << "------------------ Creando Bloques del Disco ------------------" << endl;
                     discoSimulado.crearBloques(capacidadBloque, bytesPorSector, sectores);
-                }
-                else {
-                    cout << "Ya hay un Disco creado anteriormente, eliminelo para crear uno nuevo." << endl;
+                } else {
+                    cout << "Ya hay un Disco creado anteriormente, elimínelo para crear uno nuevo." << endl;
                 }
                 break;
             }
 
-            case 2: {
+            case 3: {
                 if (!discoCreado) {
                     int platos;
                     int pistas;
@@ -117,12 +114,16 @@ int main() {
                     cout << "Danos los datos necesarios para crear el Disco: " << endl << endl;
                     cout << "Cantidad de Platos: ";
                     cin >> platos;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
                     cout << "Cantidad de Pistas por Superficie: ";
                     cin >> pistas;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
                     cout << "Cantidad de Sectores por Pista: ";
                     cin >> sectores;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
                     cout << "Cantidad de Bytes que habrá por Sector: ";
                     cin >> bytesPorSector;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
                     
                     discoSimulado.setNumPlatos(platos);
                     discoSimulado.setPistasPorSuperficie(pistas);
@@ -136,51 +137,47 @@ int main() {
                     cout << "Disco creado correctamente." << endl << endl;
 
                     cout << "------------------ Creando Bloques del Disco ------------------" << endl << endl;
-                    cout << "Capacidad del bloque: " << endl;
+                    cout << "Capacidad del bloque: ";
                     cin >> capacidadBloque;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpiar buffer
 
-                    if (capacidadBloque <= 0 && capacidadBloque > bytesPorSector) {
+                    if (capacidadBloque <= 0 || capacidadBloque > bytesPorSector) {
                         cout << "No se puede crear los bloques." << endl;
-                    }
-                    else {
+                    } else {
                         discoSimulado.crearBloques(capacidadBloque, bytesPorSector, sectores);
                     }
-                }
-                else {
-                    cout << "Ya hay un disco creando anteriormente, eliminelo para poder crear un nuevo Disco" << endl;
-                }
-                break;
-            }
-
-            case 3: {
-                if (discoCreado) {
-                    cout << "------------------ Capacidad del Disco ------------------" << endl << endl;
-                    discoSimulado.capacidad();
-                }
-                else {
-                    cout << "No hay un Disco creado, debe crear uno primero." << endl;
+                } else {
+                    cout << "Ya hay un Disco creado anteriormente, elimínelo para crear uno nuevo." << endl;
                 }
                 break;
             }
 
             case 4: {
+                if (discoCreado) {
+                    discoSimulado.capacidad();
+                }
+                else {
+                    cout << "No hay un disco creado." << endl;
+                }
+                break;
+            }
+
+            case 5: {
                 cout << "------------------ Eliminacion del Disco ------------------" << endl << endl;
                 discoSimulado.eliminarDisco();
                 discoCreado = false;
                 break;
             }
 
-            case 5: {
-                cout << "------------------ Finalizando la Simulación del Disco ------------------" << endl << endl;
-                cout << "Saliendo del programa de Disco." << endl;
+            case 6: {
+                cout << "Simulación del disco terminada." << endl;
                 return 0;
             }
 
             default: {
-                cout << "La opcion que ingreso no esta disponible, intente de nuevo." << endl << endl;
+                cout << "Opción no válida, intente de nuevo." << endl;
                 break;
             }
         }
     }
-    return 0;
 }
