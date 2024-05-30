@@ -1,6 +1,6 @@
 #include <iostream>
 #include "./Disco.cpp"
-#include "./BufferManager.cpp"
+//#include "./BufferManager.cpp"
 using namespace std;
 
 void convertirCSVaTxt() {
