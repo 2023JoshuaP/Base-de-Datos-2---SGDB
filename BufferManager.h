@@ -6,6 +6,7 @@
 #include <string>
 #include "./PageTable.cpp"
 #include "./BufferPool.cpp"
+using namespace std;
 
 class BufferManager {
     public:
