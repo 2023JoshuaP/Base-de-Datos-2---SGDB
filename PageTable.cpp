@@ -255,3 +255,21 @@ void PageTable::aplicarLRU(int numPagina, int numFrameAignorar, bool& eliminarPa
         aplicarLRU(numPagina, numFrameDelMayorLastUsed, eliminarPageSinEscrituraEnDisco, eliminarPageConEscrituraEnDisco, numPaginaEliminada);
     }
 }
+
+string PageTable::analizarPageTableParaAgregarPagina(int numPagina) {
+    if (this->verificarExistenciaDePagina(numPagina) == true) {
+        cout << "-----------------------------------" << endl;
+        cout << "La Pagina ha sido encontrada." << endl;
+        cout << "-----------------------------------" << endl;
+        int numFrame = this->getNumFrameDeUnaPagina(numPagina);
+        this->actualizarInfoDePageTableSolictandoNuevaPagina(numPagina, numFrame);
+        string normal = "normal";
+        normal = normal + "," + to_string(INT16_MAX);
+        return normal;
+    }
+    else {
+        bool eliminarPageSinEscrituraEnDisco = false;
+        bool eliminarPageConEscrituraEnDisco = false;
+        cout << "La Pagina no se encuentra en la Page Table." << endl;
+    }
+}
