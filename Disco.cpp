@@ -6,7 +6,7 @@ int calcularTamRegistro(const string& linea) {
     int tamanio = 0;
     stringstream ss(linea);
     string campo;
-    while (getline(ss, campo, '#')) {
+    while (getline(ss, campo, ',')) {
         if (campo != "NULL") {
             if (isdigit(campo[0])) {
                 size_t posPunto = campo.find('.');
@@ -96,9 +96,11 @@ void Disco::eliminarDisco() {
 }
 
 void Disco::insertarRegistrosEnSector(ofstream& archivoSector, ifstream& archivoTexto, int registrosPorSector) {
-    for (int i = 0; i < registrosPorSector; i++) {
+    // Leer registros del archivo de texto y almacenarlos en el sector
+    for (int i = 0; i < registrosPorSector; ++i) {
         string linea;
         if (getline(archivoTexto, linea)) {
+            // Insertar registro en el archivo del sector
             archivoSector << linea << endl;
         }
     }
@@ -106,22 +108,27 @@ void Disco::insertarRegistrosEnSector(ofstream& archivoSector, ifstream& archivo
 }
 
 void Disco::llenarRegistrosEnSector(const string& archivo) {
-    string path = "/home/josue/Base de Datos II - SGBD/Base-de-Datos-2---SGDB/" + archivo;
+    string path = "/home/josue/Base de Datos II - SGBD/Base-de-Datos-2---SGDB/output/" + archivo;
     ifstream archivoTxt(path);
+    if (!archivoTxt.is_open()) {
+        cout << "Error al abrir el archivo." << endl;
+        return;
+    }
 
     string linea;
     while (getline(archivoTxt, linea)) {
-        int tamRegistro = calcularTamRegistro(linea);
+        int tamanoRegistro = calcularTamRegistro(linea);
         int bytes = this->bytesPorSector;
-        int registrosSector = bytes / tamRegistro;
+        int registrosSector = bytes / tamanoRegistro;
 
-        for (int platos = 1; platos <= this->numPlatos; numPlatos++) {
+        for (int platos = 1; platos <= this->numPlatos; platos++) {
             for (int superficies = 1; superficies <= 2; superficies++) {
                 for (int pistas = 1; pistas <= this->pistasPorSuperficie; pistas++) {
                     for (int sectores = 1; sectores <= this->sectorPorPista; sectores++) {
-                        string archivoSector = "Disco/Plato " + to_string(platos) + "/Superficie " + to_string(superficies) +
-                                            "/Pista " + to_string(pistas) + "/" + to_string(sectores) + ".txt";
-                        ofstream archivoSectorEscritura(archivoSector, ios::app);
+                        string carpetaPista = "Disco/Plato " + to_string(platos) + "/Superficie " +
+                                            to_string(superficies) + "/Pista " + to_string(pistas);
+                        string archivoSector = carpetaPista + "/" + to_string(sectores) + ".txt";
+                        ofstream archivoSectorEscritura(archivoSector, ios::app); // Modo de apertura para agregar al final
                         insertarRegistrosEnSector(archivoSectorEscritura, archivoTxt, registrosSector);
                         archivoSectorEscritura.close();
                     }
@@ -129,6 +136,7 @@ void Disco::llenarRegistrosEnSector(const string& archivo) {
             }
         }
     }
+
     archivoTxt.close();
 }
 
